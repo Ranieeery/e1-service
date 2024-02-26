@@ -20,15 +20,15 @@ public class TitleReceiptController extends AbstractController  {
     public TitleReceiptSearchResponse search(SearchTitleReceiptRequest request) {
         return handle(request);
     }
-    
+
     public List<TituloReciboDTO> findById(Long id){
         SearchTitleReceiptRequest request = new SearchTitleReceiptRequest();
-        request.setId(id); 
+        request.setId(id);
         return ((TitleReceiptSearchResponse)handle(request)).getValues();
     }
     public List<TituloReciboDTO> findByName(String nome){
         SearchTitleReceiptRequest request = new SearchTitleReceiptRequest();
-        request.setNome(nome); 
+        request.setNome(nome);
         return ((TitleReceiptSearchResponse)handle(request)).getValues();
     }
 }

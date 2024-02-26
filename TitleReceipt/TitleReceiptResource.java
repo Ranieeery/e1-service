@@ -42,19 +42,19 @@ public class TitleReceiptResource extends AbstractRestResource {
 
 		return toRestResponse(response, Status.OK);
 	}
-	
+
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON_VALUE)
-	public Response search(@QueryParam("id") Long id, 
-			@QueryParam("nome") String nome,
-			@QueryParam("_pageSize") Integer pageSize, 
-			@QueryParam("_pageIndex") Integer pageIndex,
-			@QueryParam("_matchMode") String matchMode, 
-			@QueryParam("_sortField") String sortField, 
-			@QueryParam("_sortOrder") String sortOrder) {
+	public Response search(@QueryParam("id") Long id,
+						   @QueryParam("nome") String nome,
+						   @QueryParam("_pageSize") Integer pageSize,
+						   @QueryParam("_pageIndex") Integer pageIndex,
+						   @QueryParam("_matchMode") String matchMode,
+						   @QueryParam("_sortField") String sortField,
+						   @QueryParam("_sortOrder") String sortOrder) {
 		SearchTitleReceiptRequest searchTitleReceiptRequest = new SearchTitleReceiptRequest();
-				
+
 		if (id != null && !id.equals("")) {
 			searchTitleReceiptRequest.setId(id);
 		}
@@ -72,7 +72,7 @@ public class TitleReceiptResource extends AbstractRestResource {
 		}
 		searchTitleReceiptRequest.setSortOrder(EnumUtil.getEnumIgnoringCaseOrNull(SortOrder.class, sortOrder));
 		searchTitleReceiptRequest.setMatchMode(EnumUtil.getEnumIgnoringCaseOrDefault(MatchMode.class, matchMode, MatchMode.START));
-		
+
 		TitleReceiptSearchResponse response = controller.search(searchTitleReceiptRequest);
 		return toRestResponse(response, Status.OK);
 	}

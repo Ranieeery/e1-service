@@ -15,7 +15,7 @@ import br.com.empresa1.report.service.command.response.TitleReceiptSearchRespons
 
 @HibernateCommand
 public class SearchTitleReceiptNativeCommand extends
-		AbstractHibernateNativeQuerySearchCommand<TituloReciboDTO, Long, SearchTitleReceiptRequest, TitleReceiptSearchResponse> {
+	AbstractHibernateNativeQuerySearchCommand<TituloReciboDTO, Long, SearchTitleReceiptRequest, TitleReceiptSearchResponse> {
 
 	protected String createSQL(SearchTitleReceiptRequest request) {
 		StringBuilder sql = new StringBuilder("");
@@ -28,28 +28,28 @@ public class SearchTitleReceiptNativeCommand extends
 		sql.append(" AND RP.CID_ID = RE.CID_ID (+) ");
 
 		if (request.getId() != null) {
-            String idString = request.getId().toString();
-            int idLength = idString.length();
-            if (idLength > 0 && idLength < 4) {
-                sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID >= 0 AND RP.REP_ID < 9999 ");
-            } else if (idLength >= 4 && idLength <= 5) {
-                sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID < 999999 ");
-            } else if (idLength > 5 && idLength <= 7) {
-                sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID < 9999999 ");
-            }
-        }
+			String idString = request.getId().toString();
+			int idLength = idString.length();
+			if (idLength > 0 && idLength < 4) {
+				sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID >= 0 AND RP.REP_ID < 9999 ");
+			} else if (idLength >= 4 && idLength <= 5) {
+				sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID < 999999 ");
+			} else if (idLength > 5 && idLength <= 7) {
+				sql.append("AND RP.REP_ID LIKE '%' || :REP_ID || '%' AND RP.REP_ID < 9999999 ");
+			}
+		}
 
-        if (StringUtils.isNotBlank(request.getNome())) {
-            int nomeLength = request.getNome().length();
-            if (nomeLength > 0 && nomeLength < 2) {
-                sql.append("AND RP.REP_ID  >= 0 AND RP.REP_ID <= 9999 ");
-                sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' ");
-            } else if (nomeLength >= 2 && nomeLength <= 5) {
-                sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' AND RP.REP_ID < 999999 ");
-            } else if (nomeLength > 5 && nomeLength <= 7) {
-                sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' AND RP.REP_ID < 9999999 ");
-            }
-        }
+		if (StringUtils.isNotBlank(request.getNome())) {
+			int nomeLength = request.getNome().length();
+			if (nomeLength > 0 && nomeLength < 2) {
+				sql.append("AND RP.REP_ID  >= 0 AND RP.REP_ID <= 9999 ");
+				sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' ");
+			} else if (nomeLength >= 2 && nomeLength <= 5) {
+				sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' AND RP.REP_ID < 999999 ");
+			} else if (nomeLength > 5 && nomeLength <= 7) {
+				sql.append("AND UPPER(RP.REP_TITULO_RECIBO) LIKE '%' || UPPER(:nome) || '%' AND RP.REP_ID < 9999999 ");
+			}
+		}
 		sql.append("ORDER BY RP.REP_ID ASC");
 
 		return sql.toString();
@@ -58,7 +58,7 @@ public class SearchTitleReceiptNativeCommand extends
 	@Override
 	protected void setQueryParameters(Query query, SearchTitleReceiptRequest request) {
 		if (request.getId() != null) {
-			query.setParameter("USU_ID", request.getId());
+			query.setParameter("REP_ID", request.getId());
 		}
 
 		if (StringUtils.isNotBlank(request.getNome())) {

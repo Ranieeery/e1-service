@@ -9,7 +9,7 @@ import br.com.empresa1.report.service.command.response.TitleReceiptSearchRespons
 public class SearchTitleReceiptRequest extends AbstractSearchRequest {
 
     private static final long serialVersionUID = 8665216810083510L;
-    
+
     private Long id;
     private String nome;
 
