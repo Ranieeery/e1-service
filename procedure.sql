@@ -1,0 +1,45 @@
+CREATE OR REPLACE FUNCTION FN_REIMPRESSAO_RECIBO(
+    P_RECIBO   IN NUMBER   DEFAULT NULL,
+    P_ENTIDADE IN NUMBER   DEFAULT NULL,
+    P_PEDIDO   IN NUMBER   DEFAULT NULL,
+    P_DATAINI  IN DATE     DEFAULT NULL,
+    P_DATAFIM  IN DATE     DEFAULT NULL,
+    P_ORDEM    IN VARCHAR2
+) RETURN NUMBER IS
+    TYPE t_rem_recibo_emitido IS RECORD (
+        remid REM_RECIBO_EMITIDO.REM_ID%TYPE,
+        rem_qtd_reimpressao REM_RECIBO_EMITIDO.REM_QTD_REIMPRESSAO%TYPE,
+        rem_dt_ultima_reimpressao REM_RECIBO_EMITIDO.REM_DT_ULTIMA_REIMPRESSAO%TYPE
+    );
+    TYPE t_tab_rem_recibo_emitido IS TABLE OF t_rem_recibo_emitido;
+    v_tab_rem_recibo_emitido t_tab_rem_recibo_emitido;
+   PRAGMA AUTONOMOUS_TRANSACTION;                                                    
+BEGIN
+    SELECT RE.REM_ID, RE.REM_QTD_REIMPRESSAO, RE.REM_DT_ULTIMA_REIMPRESSAO
+    BULK COLLECT INTO v_tab_rem_recibo_emitido
+    FROM REM_RECIBO_EMITIDO RE, ENT_ENTIDADE ENT, REP_RECIBO_PAGAMENTO REP
+    WHERE ENT.CID_ID = (SELECT CID_ID FROM CID_CIDADE)
+    	AND ENT.ENT_ID = RE.ENT_ID
+        AND ((P_RECIBO IS NULL AND RE.REP_ID = REP.REP_ID) OR RE.REP_ID = P_RECIBO)
+        AND (P_ENTIDADE IS NULL OR RE.ENT_ID = P_ENTIDADE)
+        AND (P_PEDIDO IS NULL OR RE.REM_NPEDIDO = P_PEDIDO)
+        AND ((P_DATAINI IS NULL) OR (RE.REM_DT_PROCESSAMENTO >= P_DATAINI))
+        AND ((P_DATAFIM IS NULL) OR (RE.REM_DT_PROCESSAMENTO - 1 <= P_DATAFIM))
+    ORDER BY (CASE WHEN P_ORDEM = '01' THEN ENT.ENT_ID END),
+             (CASE WHEN P_ORDEM = '02' THEN ENT.ENT_NOME END);
+
+    FOR i IN 1..v_tab_rem_recibo_emitido.COUNT LOOP
+	        UPDATE REM_RECIBO_EMITIDO RE
+	        SET REM_QTD_REIMPRESSAO = v_tab_rem_recibo_emitido(i).rem_qtd_reimpressao + 1,
+	            REM_DT_ULTIMA_REIMPRESSAO = SYSDATE
+	        WHERE CID_ID = (SELECT CID_ID FROM CID_CIDADE)
+		        AND (SELECT ENT.ENT_ID FROM ENT_ENTIDADE ENT WHERE ENT.ENT_ID = RE.ENT_ID) = ENT_ID
+		        AND REM_ID = v_tab_rem_recibo_emitido(i).remid
+	       		AND (SYSDATE - v_tab_rem_recibo_emitido(i).rem_dt_ultima_reimpressao) * 24 * 60 > 1;
+    END LOOP;
+    COMMIT;
+    RETURN 0;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+END;
